@@ -85,9 +85,9 @@ boolean Plugin_046(byte function, char *string) {
       if ((bitstream2 & 0xF00) != 0xF00) return false; // check if 'E' has all 4 bits set
       if ((bitstream2 & 0xfff) != 0xF00) { 
          type=1;                                    // Xiron
-         if (RawSignal.Pulses[0] != PLUGIN_ID) {    
-            return false;                           // only accept plugin_001 translated Xiron packets
-         }
+         // if (RawSignal.Pulses[0] != PLUGIN_ID) {    
+         //   return false;                           // only accept plugin_001 translated Xiron packets
+         // }
       } else {
          type=0;                                    // Auriol
          rc = (bitstream1 >> 12) & 0x07;            // get 3 bits
