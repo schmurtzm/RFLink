@@ -8,7 +8,20 @@ boolean FetchSignal() {
   static const uint8_t Fport = digitalPinToPort(PIN_RF_RX_DATA);
   static const uint8_t FstateMask = (HIGH ? Fbit : 0);                          // When the 433RX is at rest, the output is low. StateSignal must be HIGH
   //
-  static const unsigned long LoopsPerMilli = 480UL; // 345UL;                   // Around 480, Arduino IDE 1.8.9 - Arduino Nano
+
+#ifndef F_CPU
+#error "F_CPU must be defined as the CPU Clock frequency (which is not necessarily equal to the crystal frequency)"
+#endif
+
+#if F_CPU==8000000U
+  // Arduino IDE 1.8.9 - Pro-mini 3.3v@08MHz
+  static const unsigned long LoopsPerMilli = 240UL;
+#else
+  // F_CPU==16000000U
+  // Arduino IDE 1.8.9 - Pro-mini 5.0v@16MHz
+  static const unsigned long LoopsPerMilli = 480UL;
+#endif
+
   static const unsigned long Overhead = 2UL;                                    // 6/1000mS*LoopsPerMilli
   static const unsigned long maxloops = SIGNAL_TIMEOUT * LoopsPerMilli;
   //
