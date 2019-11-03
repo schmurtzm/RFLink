@@ -9,20 +9,25 @@ boolean FetchSignal() {
   static const uint8_t FstateMask = (HIGH ? Fbit : 0);                          // When the 433RX is at rest, the output is low. StateSignal must be HIGH
   //
 
-#ifndef F_CPU
-#error "F_CPU must be defined as the CPU Clock frequency (which is not necessarily equal to the crystal frequency)"
-#endif
-
-#if F_CPU==8000000U
-  // Arduino IDE 1.8.9 - Pro-mini 3.3v@08MHz
-  static const unsigned long LoopsPerMilli = 240UL;
-#else
-  // F_CPU==16000000U
-  // Arduino IDE 1.8.9 - Pro-mini 5.0v@16MHz
+#if F_CPU==16000000U
+#warning "F_CPU @16MHz, LoopsPerMilli = 480UL"
+  // Arduino IDE 1.8.9 - Pro-mini @16MHz
   static const unsigned long LoopsPerMilli = 480UL;
+  static const unsigned long Overhead = 2UL;                                   // 6/1000mS*LoopsPerMilli
+#define LoopsPerMilliSet
+#endif
+#if F_CPU==8000000U
+#warning "F_CPU @8MHz, LoopsPerMilli = 240UL"
+  // Arduino IDE 1.8.9 - Pro-mini @8MHz
+  static const unsigned long LoopsPerMilli = 240UL;
+  static const unsigned long Overhead = 2UL;                                    // 6/1000mS*LoopsPerMilli
+#define LoopsPerMilliSet
+#endif
+#ifndef LoopsPerMilliSet
+#error "F_CPU not set or unexpected Frequency"
 #endif
 
-  static const unsigned long Overhead = 2UL;                                    // 6/1000mS*LoopsPerMilli
+
   static const unsigned long maxloops = SIGNAL_TIMEOUT * LoopsPerMilli;
   //
   static unsigned long PulseLength;
