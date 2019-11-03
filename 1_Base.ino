@@ -62,7 +62,9 @@ void setup() {
     digitalWrite(PIN_BSF_0, HIGH);                                                // rflink board switch signal
   */
 
-  Serial.print(F("20;00;Nodo RadioFrequencyLink - RFLink Gateway V1.1 - "));
+  delay(TRANSMITTER_STABLE_DELAY);
+
+  Serial.print(F("20;00;Nodo RadioFrequencyLink - RFLink Gateway V2.0 - "));
   sprintf_P(pbuffer, PSTR("R%02x;"), REVNR);
   Serial.println(pbuffer);
 
