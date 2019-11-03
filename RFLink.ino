@@ -17,7 +17,7 @@
 #include <avr/power.h>
 
 #define BUILDNR                         0x07                                    // shown in version
-#define REVNR                           0x33                                    // shown in version and startup string
+#define REVNR                           0x42                                    // shown in version and startup string
 #define MIN_RAW_PULSES                    74 // 20                              // =8 bits. Minimal number of bits*2 that need to have been received before we spend CPU time on decoding the signal.
 #define RAWSIGNAL_SAMPLE_RATE             30                                    // Sample width / resolution in uSec for raw RF pulses.
 #define MIN_PULSE_LENGTH                  60 // 25                              // Pulses shorter than this value in uSec. will be seen as garbage and not taken as actual pulses.
@@ -33,6 +33,7 @@
 #define INPUT_COMMAND_SIZE                60                                    // Maximum number of characters that a command via serial can be.
 #define PRINT_BUFFER_SIZE                 60                                    // Maximum number of characters that a command should print in one go via the print buffer.
 
+/*
 #define VALUE_PAIR                      44
 #define VALUE_ALLOFF                    55
 #define VALUE_OFF                       74
@@ -45,6 +46,7 @@
 #define VALUE_CONFIRM                   81
 #define VALUE_LIMIT                     82
 #define VALUE_ALLON                     141
+*/
 
 // PIN Definition
 
