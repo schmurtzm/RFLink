@@ -9,10 +9,14 @@
 #include "RFLink.h"
 #include "2_Signal.h"
 #include "5_Plugin.h"
+#include <EEPROM.h> //used to store current plugins states
+#include <FS.h>     // To save MQTT parameters
+#include <ArduinoJson.h>
 
 boolean (*Plugin_ptr[PLUGIN_MAX])(byte, char *); // Receive plugins
 byte Plugin_id[PLUGIN_MAX];
 byte Plugin_State[PLUGIN_MAX];
+String Plugin_Description[PLUGIN_MAX];
 
 boolean RFDebug = RFDebug_0;     // debug RF signals with plugin 001 (no decode)
 boolean QRFDebug = QRFDebug_0;   // debug RF signals with plugin 001 but no multiplication (faster?, compact)
@@ -536,23 +540,51 @@ void PluginInit(void)
 {
   byte x;
 
+
+
+
+
+  // // Allocate a buffer to store contents of the file.
+  // std::unique_ptr<char[]> buf(new char[size]);
+
+  // configFile.readBytes(buf.get(), size);
+  // DynamicJsonBuffer jsonBuffer;
+  // JsonObject& json = jsonBuffer.parseObject(buf.get());
+  // json.printTo(Serial);
+  // if (json.success()) {
+  //   Serial.println("\nparsed json");
+
+  // StaticJsonDocument<2500> doc;
+  // JsonObject obj = doc.createNestedObject();
+
+  // File configFile = SPIFFS.open("/protocols.json", "w");
+  // serializeJson(doc, configFile);
+  // serializeJson(doc, Serial);
+  // configFile.close();
+
+
   // Wis de pointertabel voor de plugins.
   for (x = 0; x < PLUGIN_MAX; x++)
   {
     Plugin_ptr[x] = 0;
     Plugin_id[x] = 0;
+
     Plugin_State[x] = P_Enabled;
+
+    //EEPROM.get(x, Plugin_State[x]);
   }
 
   x = 0;
 
 #ifdef PLUGIN_001
   Plugin_id[x] = 1;
+  Plugin_Description[x] = PLUGIN_DESC_001;
   Plugin_ptr[x++] = &Plugin_001;
 #endif
 
 #ifdef PLUGIN_002
   Plugin_id[x] = 2;
+  Plugin_Description[x] = PLUGIN_DESC_002;
   Plugin_ptr[x++] = &Plugin_002;
 #endif
 
@@ -1175,6 +1207,55 @@ void PluginInit(void)
   Plugin_id[x] = 255;
   Plugin_ptr[x++] = &Plugin_255;
 #endif
+
+
+
+
+// read config file to desactivated protocols
+#ifdef AUTOCONNECT_ENABLED
+  Serial.println("mounting FS...");
+
+  if (SPIFFS.begin())
+  {
+    Serial.println("mounted file system");
+    if (SPIFFS.exists("/protocols.json"))
+    {
+      //file exists, reading and loading
+      Serial.println("reading protocols file");
+      File configFile = SPIFFS.open("/protocols.json", "r");
+      if (configFile)
+      {
+        Serial.println("opened protocols file");
+        size_t size = configFile.size();
+        if (size == 0)
+        {
+          Serial.println("History file empty");
+        }
+        else
+        {
+          StaticJsonDocument<6400> doc;
+          DeserializationError error = deserializeJson(doc, configFile);
+          if (error)
+          {
+            Serial.println(F("Failed to read file, using default configuration"));
+          }
+          
+
+          for (x = 0; x < PLUGIN_MAX; x++)
+          {            
+            if (doc[x][String(Plugin_id[x])] == 0)
+            {
+              Plugin_State[x] = P_Disabled;
+            }
+          }
+          configFile.close();
+          
+        }
+      }
+    }
+  }
+#endif // AUTOCONNECT_ENABLED
+
 
   // Initialiseer alle plugins door aanroep met verwerkingsparameter PLUGIN_INIT
   PluginInitCall(0, 0);

@@ -86,6 +86,10 @@
 #ifdef PLUGIN_001
 #include "../4_Display.h"
 
+//static const char PLUGIN_DESC_001[] PROGMEM  = {"Long Packet Translation and debugging"};   // tentative d'optmisation mémoire...
+String PLUGIN_DESC_001 = "Long Packet Translation and debugging";
+
+
 boolean Plugin_001(byte function, char *string)
 {
    // byte HEconversiontype = 1; // 0=No conversion, 1=conversion to Elro 58 pulse protocol (same as FA500R Method 1)

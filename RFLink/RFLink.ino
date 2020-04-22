@@ -119,7 +119,10 @@ void loop()
   loop_AutoConnect();
 #endif
 #ifdef MQTT_ENABLED
+  if (WiFi.status() == WL_CONNECTED)
+  {
   checkMQTTloop();
+  }
 #endif
   if (ScanEvent())
     sendMsg();
@@ -134,6 +137,9 @@ void sendMsg()
 #endif
 #ifdef MQTT_ENABLED
     publishMsg();
+#endif
+#ifdef AUTOCONNECT_ENABLED
+  LastMsg = pbuffer;
 #endif
 #ifdef OLED_ENABLED
     print_OLED();
